@@ -15,6 +15,32 @@
  *******************************************************************************/ 
 package test;
 
+import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.RetrieveAndRank;
+import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrCluster;
+import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrCluster.Status;
+import com.ibm.watson.developer_cloud.retrieve_and_rank.v1.model.SolrClusterOptions;
+
+
 public class TestApplication {
+	
+	public static void main(String[] args) throws InterruptedException {
+		RetrieveAndRank service = new RetrieveAndRank();
+		service.setUsernameAndPassword("dde0d58a-2f6b-436b-9ce0-5b72c6fbd7db", "MwA0Ei6BO5EJ");
+
+		// 1 create the Solr Cluster
+		SolrClusterOptions options = new SolrClusterOptions("note", 1);
+		SolrCluster cluster = service.createSolrCluster(options).execute();
+		System.out.println("Solr cluster: " + cluster);
+
+		// 2 wait until the Solr Cluster is available
+		while (cluster.getStatus() == Status.NOT_AVAILABLE) {
+		  Thread.sleep(10000); // sleep 10 seconds
+		  cluster = service.getSolrCluster(cluster.getId()).execute();
+		  System.out.println("Solr cluster status: " + cluster.getStatus());
+		}
+
+		// 3 list Solr Clusters
+		System.out.println("Solr clusters: " + service.getSolrClusters().execute());
+	}
 
 }
